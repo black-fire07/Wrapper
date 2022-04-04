@@ -48,14 +48,15 @@ contract Wrapper is Ownable{
     }
 
     function payINR(uint256 amount) public {
-        uint256 _amount = amount * getPrice() * 10**18;
+        uint256 _amount = amount * getPrice();
 
         inr_usdt.transferFrom(msg.sender, address(this), _amount);
         token.mint(msg.sender, _amount);
     }
 
     function getinr(uint256 amount) public {
-        uint256 _amount = amount * getPrice() * 10**18;
+        uint256 _amount = amount * getPrice()
+;
 
         token.transferFrom(msg.sender,address(this), _amount);
         token.burn(_amount);
