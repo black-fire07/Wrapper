@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract MyToken is ERC20, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -26,46 +25,34 @@ contract MyToken is ERC20, AccessControl {
 
 
 contract Wrapper is Ownable{
-    IERC20 inr_usdt;
-    MyToken public token;
-    AggregatorV3Interface internal priceFeed;
+    IERC20 usdt;
+    uint256 constant rate = 75;
 
-    constructor( address _inr_usdt, address _token){
-        priceFeed = AggregatorV3Interface(0x605D5c2fBCeDb217D7987FC0951B5753069bC360);
-        inr_usdt = IERC20(_inr_usdt);
+    MyToken public token;
+    constructor( address _usdt, address _token){
+        usdt = IERC20(_usdt);
         token = MyToken(_token);
     }
 
-    function getPrice() public view returns(uint){
-        (
-            uint80 roundID, 
-            int price,
-            uint startedAt,
-            uint timeStamp,
-            uint80 answeredInRound
-        ) = priceFeed.latestRoundData();
-        return uint(price);
+
+    function payusdt(uint256 amount) public {
+        uint256 _amount = amount * 10**18;
+
+        usdt.transferFrom(msg.sender, address(this), _amount);
+        token.mint(msg.sender, rate * _amount);
     }
 
-    function payINR(uint256 amount) public {
-        uint256 _amount = amount * getPrice();
-
-        inr_usdt.transferFrom(msg.sender, address(this), _amount);
-        token.mint(msg.sender, _amount);
-    }
-
-    function getinr(uint256 amount) public {
-        uint256 _amount = amount * getPrice()
-;
+    function getusdt(uint256 amount) public {
+        uint256 _amount = amount * 10**18;
 
         token.transferFrom(msg.sender,address(this), _amount);
         token.burn(_amount);
-        inr_usdt.transfer(msg.sender, _amount);
+        usdt.transfer(msg.sender, _amount/rate);
     }    
 
 
-    function withdrawAllinr_usdt() external onlyOwner{
-        inr_usdt.transfer(owner(),inr_usdt.balanceOf(address(this)));
+    function withdrawAllusdt() external onlyOwner{
+        usdt.transfer(owner(),usdt.balanceOf(address(this)));
     }
 
 }
