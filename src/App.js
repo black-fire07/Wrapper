@@ -44,8 +44,8 @@ function App() {
     const networkId = await web3.eth.net.getId();
 
     // const hell = Helloabi.networks[networkId];
-    if (networkId == 97) {
-      alert("you are connected to bscTest");
+    if (networkId == 80001) {
+      alert("you are connected to MumbaiTest");
       const token = new web3.eth.Contract(
         [
           { inputs: [], stateMutability: "nonpayable", type: "constructor" },
@@ -219,6 +219,7 @@ function App() {
           },
           {
             inputs: [
+              { internalType: "address", name: "account", type: "address" },
               { internalType: "uint256", name: "amount", type: "uint256" },
             ],
             name: "burn",
@@ -325,6 +326,15 @@ function App() {
           },
           {
             inputs: [
+              { internalType: "address", name: "_add", type: "address" },
+            ],
+            name: "setWrapperAddress",
+            outputs: [{ internalType: "bool", name: "", type: "bool" }],
+            stateMutability: "nonpayable",
+            type: "function",
+          },
+          {
+            inputs: [
               { internalType: "bytes4", name: "interfaceId", type: "bytes4" },
             ],
             name: "supportsInterface",
@@ -367,8 +377,15 @@ function App() {
             stateMutability: "nonpayable",
             type: "function",
           },
+          {
+            inputs: [],
+            name: "wrapper",
+            outputs: [{ internalType: "address", name: "", type: "address" }],
+            stateMutability: "view",
+            type: "function",
+          },
         ],
-        "0x942D2920584BD889e1C97155C26220aBf2148C8f"
+        "0xd91cf18799F7cC60051Ca2369604C27B4375e489"
       );
       const usdt = new web3.eth.Contract(
         [
@@ -536,7 +553,7 @@ function App() {
             type: "function",
           },
         ],
-        "0xFe2f6e14D7977761f8d5fED021cfC456941cf7C3"
+        "0x44dfAe0500e00B312fD94be9D77D0311c5Eb8455"
       );
 
       const wrapper = new web3.eth.Contract(
@@ -567,6 +584,13 @@ function App() {
             ],
             name: "OwnershipTransferred",
             type: "event",
+          },
+          {
+            inputs: [],
+            name: "getPrice",
+            outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+            stateMutability: "view",
+            type: "function",
           },
           {
             inputs: [
@@ -626,14 +650,14 @@ function App() {
             type: "function",
           },
         ],
-        "0x0d2663F02F5Bed1c04126576429459A2f3D9bc69"
+        "0x3268fEfa35a64A097c0C928C907962C486c025d8"
       );
 
       setToken(token);
       setUsdt(usdt);
       setWrapp(wrapper);
     } else {
-      alert("connect to BscTest and refresh");
+      alert("connect to MumbaiTest and refresh");
     }
   };
 
@@ -641,7 +665,7 @@ function App() {
     let _amount = amount + "000000000000000000";
     try {
       await Usdt.methods
-        .approve("0x0d2663f02f5bed1c04126576429459a2f3d9bc69", _amount)
+        .approve("0xe6Ec5A763b0a578062ee4f8D75D935C4a73B2AD6", _amount)
         .send({ from: address })
         .on("transactionHash", (hash) => {
           Wrapp.methods.payusdt(amount).send({ from: address });
@@ -652,14 +676,8 @@ function App() {
   };
 
   const _getusdt = async (amount) => {
-    let _amount = amount + "000000000000000000";
     try {
-      await Token.methods
-        .approve("0x0d2663F02F5Bed1c04126576429459A2f3D9bc69", _amount)
-        .send({ from: address })
-        .on("transactionHash", (hash) => {
-          Wrapp.methods.getusdt(amount).send({ from: address });
-        });
+      await Wrapp.methods.getusdt(amount).send({ from: address });
     } catch (err) {
       console.log(err);
     }
