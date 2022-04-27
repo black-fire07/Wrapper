@@ -44,8 +44,8 @@ function App() {
     const networkId = await web3.eth.net.getId();
 
     // const hell = Helloabi.networks[networkId];
-    if (networkId == 80001) {
-      alert("you are connected to MumbaiTest");
+    if (networkId == 97) {
+      alert("you are connected to BSCTest");
       const token = new web3.eth.Contract(
         [
           { inputs: [], stateMutability: "nonpayable", type: "constructor" },
@@ -385,7 +385,7 @@ function App() {
             type: "function",
           },
         ],
-        "0xd91cf18799F7cC60051Ca2369604C27B4375e489"
+        "0xC5014ea5668f85138814e75F33b7ac3168828EE5"
       );
       const usdt = new web3.eth.Contract(
         [
@@ -553,7 +553,7 @@ function App() {
             type: "function",
           },
         ],
-        "0x44dfAe0500e00B312fD94be9D77D0311c5Eb8455"
+        "0x836e106039CaDF4294eb32B9c7B197f2f16f3652"
       );
 
       const wrapper = new web3.eth.Contract(
@@ -650,14 +650,14 @@ function App() {
             type: "function",
           },
         ],
-        "0x3268fEfa35a64A097c0C928C907962C486c025d8"
+        "0x3f8B39b1b3285094c9E2ba3529c62fd854439EDa"
       );
 
       setToken(token);
       setUsdt(usdt);
       setWrapp(wrapper);
     } else {
-      alert("connect to MumbaiTest and refresh");
+      alert("connect to BSCTest and refresh");
     }
   };
 
@@ -665,10 +665,13 @@ function App() {
     let _amount = amount + "000000000000000000";
     try {
       await Usdt.methods
-        .approve("0xe6Ec5A763b0a578062ee4f8D75D935C4a73B2AD6", _amount)
+        .approve("0x3f8B39b1b3285094c9E2ba3529c62fd854439EDa", _amount)
         .send({ from: address })
-        .on("transactionHash", (hash) => {
-          Wrapp.methods.payusdt(amount).send({ from: address });
+        .on("transactionHash", async (hash) => {
+          await Wrapp.methods
+            .payusdt(amount)
+            .send({ from: address })
+            .on("transactionHash", async (hash) => {});
         });
     } catch (err) {
       console.log(err);
